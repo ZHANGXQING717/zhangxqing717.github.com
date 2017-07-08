@@ -1,1 +1,175 @@
-<h1>helloworld</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="600"></canvas>
+<script>
+
+
+    //背景图
+    var canvas = document.getElementById("canvas").getContext("2d");
+    var img1 = new Image();
+    img1.src = "images/bg.png";//图片路径
+
+
+    //地
+
+    var img = new Image();
+    img.src = "images/ground.png";
+
+
+
+    //上管道
+    function upPipe(imgSrc, x, y, width, height) {   //构造函数
+        this.imgSrc = imgSrc;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    var upPipe = new upPipe("images/pipe.png", 0, 0, 100, 200); // 定义一个uppipe来放各参数的值
+
+
+    function drawupPipe() {
+        var image = new Image();
+        image.src = upPipe.imgSrc;
+        canvas.drawImage(image, 150, 500, 150, 800, upPipe.x, upPipe.y, upPipe.width, upPipe.height);
+
+    }
+    drawupPipe();
+
+
+    //下管道
+    function DownPipe(imgSrc, x, y, width, height) {
+        this.imgSrc = imgSrc;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    var downPipe = new DownPipe("images/pipe.png", 0, 400, 100, 200);
+
+
+    function drawDownPipe() {
+        var image = new Image();
+        image.src = downPipe.imgSrc;
+        canvas.drawImage(image, 0, 500, 150, 500, downPipe.x, downPipe.y, downPipe.width, downPipe.height);
+
+    }
+    drawDownPipe();
+
+
+    // 算分数
+    var  score = 0;
+    var isDie = false;
+    //使上下管道同时移动
+    function movePipe() {
+        upPipe.x = upPipe.x - 10;
+        downPipe.x = downPipe.x - 10;
+        if (upPipe.x < -100 || downPipe.x < -100) {   // 这里的100就是管道的宽度
+            upPipe.x = 400;
+            downPipe.x = 400;
+            isDie = true;
+            upPipe.height = parseInt(Math.random() * 300);
+            downPipe.y = upPipe.height + 200;
+            downPipe.height = 600 - downPipe.y;
+        }
+        //分数的判断条件
+       if(isDie && upPipe.x < 100){
+           score ++;
+           isDie = false;
+       }
+        //在画布上显示分数
+        canvas.fillText("score:" + score, 90, 100);
+        canvas.fillStyle = "white";
+    }
+
+
+    //鸟的三种状态，需要一个参数来随机出鸟的状态
+    var i = 0;
+    var arr = ["images/0.gif", "images/1.gif", "images/2.gif"];
+    //鸟飞
+    function flyBird() {
+        i++;
+        i = i % 3;
+        var image2 = new Image();
+        image2.src = arr[i];
+        canvas.drawImage(image2, bird.x, bird.y, bird.width, bird.height);  //画鸟
+
+    }
+
+
+    //鸟的构造函数
+    function Bird(imgSrc, x, y, width, height) {
+        this.imgSrc = imgSrc;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    var bird = new Bird("arr[i]", 100, 150, 40, 30);
+
+    //鸟的碰撞
+    function crash() {
+        console.log(bird.x + ' ' + bird.y + ' ' + downPipe.x + ' ' + downPipe.y);
+
+ if   ((bird.x + bird.width > upPipe.x ) && (bird.x < upPipe.x + upPipe.width) && ( bird.y < upPipe.y + upPipe.height)
+    ||(bird.x + bird.width > downPipe.x ) && (bird.x < downPipe.x + downPipe.width) && (bird.y + bird.height > downPipe.y)
+    ||(bird.y + bird.height > 550))
+        {
+
+            clearInterval(timer);    //停止定时器
+            canvas.fillText("game over", 110, 110);   //在画布上显示游戏结束
+
+
+        }
+        //管道移动
+        movePipe();
+        //鸟飞
+        flyBird();
+
+    }
+
+    //键盘控制小鸟
+    var v1 = 10;
+    var a = 1;
+    var v2;
+    function autoAdd() {
+        v2 = v1 + a;
+        bird.y = bird.y + (v1 + v2) / 2;
+
+    }
+    window.onkeydown = function (event) {
+        var e = event || window.event;
+        if (e.keyCode == 32) {
+            bird.y = bird.y - 50;
+        }
+    }
+
+    var timer = setInterval(function () {
+        //清理画布
+        canvas.clearRect(0, 0, 400, 600);
+        //画背景
+        canvas.drawImage(img1, 0, 0, 400, 600);
+        //上管道和下管
+        drawupPipe();
+        drawDownPipe();
+        //画地
+        canvas.drawImage(img, 0, 550, 400, 200);
+        //碰撞
+        crash();
+        //移动管道
+        //movePipe();
+        //鸟飞
+        //flyBird();
+        autoAdd();
+    }, 80);
+    //
+
+
+</script>
+</body>
+</html>
